@@ -91,21 +91,43 @@
 
 ## 3. AMBIENTE DE EXECUÇÃO (HARDWARE)
 
-* **CPU (Processador):** 13th Gen Intel® Core™ i5-1334U — 10 núcleos físicos,
-  12 processadores lógicos, clock base de 1,30 GHz
+As duas etapas foram executadas em máquinas diferentes. O FastProtein rodou em um
+notebook corporativo; o EpiBuilder foi executado em uma segunda máquina porque a
+primeira, com 8 GB de RAM, não sustentava o BePiPred-3.0 junto com as demais
+aplicações em uso.
+
+**Máquina A — FastProtein**
+
+* **CPU:** 13th Gen Intel® Core™ i5-1334U — 10 núcleos, 12 processadores lógicos,
+  clock base 1,30 GHz
 * **Memória RAM:** 8 GB DDR5-5600 (7,7 GB utilizáveis)
-* **Armazenamento:** SSD NVMe Samsung BM9C1 de 512 GB (477 GB formatados) —
+* **Armazenamento:** SSD NVMe Samsung BM9C1, 512 GB (477 GB formatados) —
   `MediaType: SSD`, `BusType: NVMe`
-* **Sistema Operacional:** Microsoft Windows 11 Home Single Language,
-  versão 10.0.26200 (build 26200), 64 bits
-* **Camada de containers:** Docker Desktop 4.93.0, engine 29.8.1 (linux/amd64)
+* **Sistema Operacional:** Windows 11 Home Single Language, versão 10.0.26200
+  (build 26200), 64 bits
+* **Containers:** Docker Desktop 4.93.0, engine 29.8.1 (linux/amd64)
+
+**Máquina B — EpiBuilder**
+
+* **Modelo:** Acer Nitro ANV15-52
+* **CPU:** 13th Gen Intel® Core™ i7-13620H — 10 núcleos, 16 processadores lógicos,
+  clock base 2,40 GHz
+* **Memória RAM:** 31,7 GB — 2 × 16 GB DDR4-3200 (Kingston)
+* **Armazenamento:** SSD NVMe WD PC SN740 SDDQNQD-512G-1014, 512 GB
+  (477 GB formatados) — `MediaType: SSD`, `BusType: NVMe`
+* **Sistema Operacional:** Windows 11 Home, versão 10.0.26200 (build 26200), 64 bits
+* **Containers:** Docker Desktop 4.93.0, engine 29.8.1 (linux/amd64)
+
+As especificações foram coletadas automaticamente pelo próprio script de execução
+(`run_analysis.ps1`, etapa 0) e estão preservadas em `logs/hardware_windows.txt`
+(Máquina A) e `logs_pc2/hardware_windows.txt` (Máquina B).
 
 ---
 
 ## 4. RESULTADOS: FASTPROTEIN
 
-Execução sobre o proteoma completo (`input.fasta`, 3.676 sequências baixadas do
-UniProt), com a imagem `bioinfoufsc/fastprotein:clean-latest`.
+Execução na **Máquina A** sobre o proteoma completo (`input.fasta`, 3.676
+sequências baixadas do UniProt), com a imagem `bioinfoufsc/fastprotein:clean-latest`.
 
 * **Tempo total de processamento:** **00:06:19** (6M18.838S)
   * início: Fri Oct 02 16:09:12 UTC 2026
@@ -188,15 +210,101 @@ proteínas passando de 150 kDa.
 
 ## 5. RESULTADOS: EPIBUILDER
 
-* **Nº de proteínas (das 50) com epítopos preditos:** _[pendente]_
+Execução sobre o `top50.fasta` — as 50 primeiras proteínas de membrana preditas
+pelo FastProtein — com a imagem `bioinfoufsc/epibuilder-core` e o parâmetro
+`--loc gram_neg`, apropriado para *Leptospira interrogans* por ser gram-negativa.
+
+Nenhuma das 50 sequências foi rejeitada na validação (`proteins_invalid.fasta`
+ficou vazio). Tempo total da execução: **8 min 14 s**, distribuídos entre
+validação do FASTA (0,5 s), predição de localização por PSORTb (1 min 37 s),
+BePiPred-3.0 (8 min 11 s), montagem dos epítopos (2 s) e exportação (0,8 s).
+
+* **Nº de proteínas (das 50) com epítopos preditos:** **7**
+
+Foram preditos **8 epítopos** no total, porque a proteína Q8F937 contribuiu com
+dois. As sete proteínas:
+
+\begingroup\footnotesize
+
+| Proteína | Descrição (UniProt) | Localização (PSORTb) | Epítopos |
+| :---- | :---- | :---- | ----: |
+| Q8F937 | Glycine dehydrogenase (decarboxylating) | Cytoplasmic | 2 |
+| Q8EZN3 | ATP-dependent zinc metalloprotease FtsH | CytoplasmicMembrane | 1 |
+| P59247 | Glycerol-3-phosphate acyltransferase | CytoplasmicMembrane | 1 |
+| Q8EXW3 | Adenylate/guanylate cyclase | Cytoplasmic | 1 |
+| Q8F145 | Phosphatidate cytidylyltransferase | CytoplasmicMembrane | 1 |
+| Q8F2Z5 | Phosphatidylserine decarboxylase proenzyme | CytoplasmicMembrane | 1 |
+| Q8EYY4 | Apolipoprotein N-acyltransferase 2 | CytoplasmicMembrane | 1 |
+
+\endgroup
+
+
+O rendimento de 7 em 50 é baixo, e isso é coerente com o material de entrada: são
+proteínas de membrana, cujas alças expostas ao meio externo — as regiões com
+potencial antigênico — representam uma fração pequena da cadeia. O restante fica
+embebido na bicamada ou voltado para o citoplasma, e o BePiPred-3.0 não atribui a
+essas regiões escore suficiente para passar do limiar de 0,15.
 
 ### 5.1. Tabela dos 5 Primeiros Epítopos Preditos
 
-_[pendente]_
+\begingroup\footnotesize
+
+| #  | ID Proteína | Descrição (abreviada)     | Epítopo (Sequência)  | Início-Fim | N-glicosilado?         |
+|:---|:------------|:--------------------------|:---------------------|:-----------|:-----------------------|
+| 1  | Q8F937      | Glycine dehydrogenase     | `TLDKTDNPLKN`        | 892–903    | Não                    |
+| 2  | Q8EZN3      | Zinc metalloprotease FtsH | `EEGTKKKPEKTVKSKKQN` | 624–642    | Não                    |
+| 3  | P59247      | Glycerol-3-P acyltransf.  | `GEEQDGDSERNR`       | 203–215    | Não                    |
+| 4  | Q8EXW3      | Adenylate/guanyl. cyclase | `KEKKPPIPPFRDKTFND`  | 402–419    | Não                    |
+| 5  | Q8F937      | Glycine dehydrogenase     | `NSTLQNQTKTN`        | 1–12       | **Sim** — NST (1–3) e NQT (6–8) |
+
+\endgroup
+
+
+*As descrições estão abreviadas para caber na tabela; os nomes completos de cada
+proteína estão na tabela da seção 5 acima.*
+
+Dos oito epítopos preditos, apenas o de número 5 apresenta sítios de
+N-glicosilação. Vale observar que o intervalo relatado pelo software abrange
+sempre uma posição a mais que o comprimento informado do epítopo — o epítopo 1
+tem 11 aminoácidos e é reportado como 892–903, que são 12 posições. O mesmo
+deslocamento aparece em todos os registros, o que indica que a coluna `End` é
+tratada como limite exclusivo pelo EpiBuilder. Os valores foram transcritos acima
+exatamente como o software os emitiu.
 
 ### 5.2. Topologia do Epítopo #1
 
-_[pendente]_
+```
+Epitopo #1    Q8F937    Cytoplasmic
+Posicao 892-903   11 aa   1.26 kDa   pI 5.63   Hidropatia media -1.56
+
+          Metodo  Limiar   Media  Cobert.   T L D K T D N P L K N
+----------------  ------  ------  -------   ---------------------
+    BepiPred-3.0    0.15    0.18        -   
+           Emini    1.00    2.37     1.00   E E E E E E E E E E E
+        Kolaskar    1.03    0.96     0.00   . . . . . . . . . . .
+     Chou Fosman    0.97    1.21     1.00   E E E E E E E E E E E
+  Karplus Schulz    0.99    1.07     1.00   E E E E E E E E E E E
+          Parker    1.26    4.01     1.00   E E E E E E E E E E E
+     All matches       -       -     0.00   . . . . . . . . . . .
+          N-Glyc       -       -     0.00   . . . . . . . . . . .
+      Hydropathy       -   -1.56        -   - + - - - - - - + - -
+
+E = residuo predito como epitopo pelo metodo    . = nao predito
+Hidropatia:  + = hidrofobico    - = hidrofilico
+```
+
+A leitura é a seguinte: cada linha é um método de predição, com seu limiar, o
+escore médio obtido e a cobertura, seguidos do mapa resíduo a resíduo ao longo do
+epítopo. Quatro dos cinco métodos clássicos — Emini, Chou-Fasman, Karplus-Schulz
+e Parker — marcam todos os 11 resíduos como antigênicos, com cobertura 1,00. O
+Kolaskar é o único divergente, com cobertura 0,00: ele pontua antigenicidade com
+base em hidrofobicidade e acessibilidade, e esse epítopo é fortemente hidrofílico
+(hidropatia média −1,56), o que o penaliza nessa escala. A linha `All matches`
+fica em 0,00 justamente porque exige concordância de todos os métodos, incluindo
+o Kolaskar. A linha `N-Glyc` confirma a ausência de sítios de N-glicosilação neste
+epítopo, e a linha `Hydropathy` mostra apenas dois resíduos hidrofóbicos (as
+leucinas nas posições 2 e 9), sendo todo o restante hidrofílico — perfil típico de
+alça exposta ao solvente.
 
 ---
 
@@ -204,8 +312,8 @@ _[pendente]_
 
 Qual o repositório git: **https://github.com/Guilfs1/bioinformatica-leptospira**
 
-* [ ] relatorio.pdf
-* [ ] input.fasta
-* [ ] top50.fasta
-* [ ] results_fastprotein/
-* [ ] results_epibuilder/
+* [x] `relatorio.pdf` — este documento
+* [x] `input.fasta` — proteoma completo UP000001408 (3.676 sequências)
+* [x] `top50.fasta` — 50 primeiras proteínas de membrana
+* [x] `results_fastprotein/` — saída completa, incluindo os dois gráficos
+* [x] `results_epibuilder/` — saída completa, incluindo topologia e planilha

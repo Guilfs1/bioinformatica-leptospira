@@ -1,0 +1,88 @@
+﻿=== COLETA: 2026-10-02T14:32:33.9772846-03:00 ===
+=== CPU ===
+
+
+Name                      : 13th Gen Intel(R) Core(TM) i7-13620H
+NumberOfCores             : 10
+NumberOfLogicalProcessors : 16
+MaxClockSpeed             : 2400
+
+
+
+=== RAM (por pente) ===
+
+
+CapacidadeGB     : 16
+Speed            : 3200
+SMBIOSMemoryType : 26
+Manufacturer     : Kingston
+PartNumber       :                     
+
+CapacidadeGB     : 16
+Speed            : 3200
+SMBIOSMemoryType : 26
+Manufacturer     : Kingston
+PartNumber       :                     
+
+
+
+Nota: SMBIOSMemoryType 24=DDR3, 26=DDR4, 34=DDR5
+=== RAM TOTAL ===
+
+
+Manufacturer : Acer
+Model        : Nitro ANV15-52
+RAMTotalGB   : 31,7
+
+
+
+=== ARMAZENAMENTO FISICO ===
+
+
+FriendlyName : NVMe WD PC SN740 SDDQNQD-512G-1014
+MediaType    : SSD
+BusType      : NVMe
+TamanhoGB    : 477
+
+
+
+Nota: MediaType=SSD + BusType=NVMe -> SSD NVMe; BusType=SATA -> SSD SATA; MediaType=HDD -> disco mecanico
+=== SISTEMA OPERACIONAL ===
+
+
+Caption        : Microsoft Windows 11 Home
+Version        : 10.0.26200
+BuildNumber    : 26200
+OSArchitecture : 64 bits
+
+
+
+=== DOCKER ===
+Client:
+ Version:           29.8.1
+ API version:       1.56
+ Go version:        go1.26.8
+ Git commit:        4a63305
+ Built:             Tue Sep 15 16:28:39 2026
+ OS/Arch:           windows/amd64
+ Context:           desktop-linux
+
+Server: Docker Desktop 4.93.0 (240920)
+ Engine:
+  Version:          29.8.1
+  API version:      1.56 (minimum version 1.40)
+  Go version:       go1.26.8
+  Git commit:       464cd50
+  Built:            Tue Sep 15 16:25:38 2026
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          v2.3.5
+  GitCommit:        1294c24a7da8e5a793ed378161673abe94118892
+ runc:
+  Version:          1.5.1
+  GitCommit:        v1.5.1-0-g8f2685a4
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+

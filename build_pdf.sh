@@ -14,8 +14,7 @@ pandoc relatorio.md \
   -V fontsize=11pt \
   -V linkcolor=blue \
   -V urlcolor=blue \
-  -V lang=pt-BR \
   --highlight-style=tango \
   --toc --toc-depth=2 \
-  -V toc-title="Sumário"
+  --metadata-file=pandoc-metadata.yaml
 echo "gerado: relatorio.pdf"
