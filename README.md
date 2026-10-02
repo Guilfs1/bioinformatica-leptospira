@@ -1,11 +1,9 @@
-# Estudo de caso — *Leptospira interrogans*
+# Estudo de caso — Leptospira interrogans
 
 Análise proteômica e predição de epítopos do proteoma de referência de
 *Leptospira interrogans* sorovar Lai (cepa 56601), usando **FastProtein** e
 **EpiBuilder**.
-
-Disciplina de Bioinformática — IFSC Câmpus Gaspar
-Integrante: Guilherme Guzzo
+Guilherme Guzzo
 
 ## Organismo
 
