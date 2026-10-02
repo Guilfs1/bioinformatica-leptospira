@@ -1,0 +1,9 @@
+# Nextflow / EpiBuilder - artefatos de execução, não entram no entregável
+results_epibuilder/work/
+.nextflow/
+.nextflow.log*
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
