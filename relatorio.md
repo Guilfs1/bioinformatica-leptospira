@@ -3,7 +3,7 @@
 **IDENTIFICAÇÃO DA EQUIPE**
 
 * **Integrantes:** Guilherme Guzzo
-* **Data:** __/09/2026
+* **Data:** 02/10/2026
 
 ---
 
@@ -91,26 +91,98 @@
 
 ## 3. AMBIENTE DE EXECUÇÃO (HARDWARE)
 
-* **CPU (Processador):** _[a preencher com a saída de coletar_hardware.ps1]_
-* **Memória RAM:** _[a preencher]_
-* **Armazenamento:** _[a preencher]_
-* **Sistema Operacional:** _[a preencher — Windows + WSL2 (Ubuntu), Docker Desktop]_
+* **CPU (Processador):** 13th Gen Intel® Core™ i5-1334U — 10 núcleos físicos,
+  12 processadores lógicos, clock base de 1,30 GHz
+* **Memória RAM:** 8 GB DDR5-5600 (7,7 GB utilizáveis)
+* **Armazenamento:** SSD NVMe Samsung BM9C1 de 512 GB (477 GB formatados) —
+  `MediaType: SSD`, `BusType: NVMe`
+* **Sistema Operacional:** Microsoft Windows 11 Home Single Language,
+  versão 10.0.26200 (build 26200), 64 bits
+* **Camada de containers:** Docker Desktop 4.93.0, engine 29.8.1 (linux/amd64)
 
 ---
 
 ## 4. RESULTADOS: FASTPROTEIN
 
-* **Tempo total de processamento:** _[pendente de execução]_
-* **Total de proteínas processadas:** _[pendente]_
-* **Total de proteínas ignoradas:** _[pendente]_
-* **Proteínas com domínio transmembranar:** _[pendente]_
-* **Proteínas com evidências de membrana:** _[pendente]_
+Execução sobre o proteoma completo (`input.fasta`, 3.676 sequências baixadas do
+UniProt), com a imagem `bioinfoufsc/fastprotein:clean-latest`.
+
+* **Tempo total de processamento:** **00:06:19** (6M18.838S)
+  * início: Fri Oct 02 16:09:12 UTC 2026
+  * término: Fri Oct 02 16:15:31 UTC 2026
+  * tempo de comandos externos: 6M0.936S — tempo interno do FastProtein: 17,902S
+* **Total de proteínas processadas:** **3.676**
+* **Total de proteínas ignoradas:** **0** (nenhuma sequência continha caracteres
+  não correspondentes a aminoácidos)
+* **Proteínas com domínio transmembranar:** **908**
+* **Proteínas com evidências de membrana:** **939**
+
+> **Nota sobre a predição de domínios transmembranares:** o FastProtein executa
+> dois preditores de TM — TMHMM-2.0c e Phobius. Nesta execução o TMHMM-2.0c
+> encerrou em 0,2 s e gravou um arquivo de saída vazio
+> (`results_fastprotein/raw/tmhmm2.txt`, 0 bytes), de modo que a coluna `TMHMM_2`
+> do `output.tsv` ficou negativa para todas as 3.676 proteínas. As 908 proteínas
+> com domínio transmembranar vêm, portanto, integralmente do Phobius
+> (coluna `Phobius_TM`), que rodou normalmente em 1M59,85S. O mesmo comportamento
+> aparece no exemplo de execução fornecido pelo professor, o que sugere que o
+> TMHMM-2.0c não acompanha a imagem `clean-latest` — provavelmente por restrição
+> de licença. O valor de 908 é o que o software reporta como `total_tm` e é o que
+> está respondido acima; o registro desta nota serve para deixar explícito de qual
+> preditor ele veio.
+
+Resultados complementares do mesmo processamento:
+
+| Métrica | Valor |
+| :---- | :---- |
+| Proteínas com peptídeo sinal (SignalP-5) | 701 |
+| Proteínas com âncora GPI (PredGPI) | 13 |
+| Proteínas com sítios de N-glicosilação | 2.710 |
+| Proteínas com domínios de retenção no R.E. | 512 |
+| Massa molecular média | 35,77 ± 25,77 kDa |
+| Ponto isoelétrico médio | 7,58 ± 1,77 |
+| Hidropatia média | −0,20 ± 0,37 |
+| Aromaticidade média | 0,10 ± 0,04 |
 
 ### 4.1. Gráficos Gerados
 
-_[gráfico de localização subcelular — pendente]_
+**Localização subcelular** (`results_fastprotein/image/subcell-resume-bar.png`)
 
-_[gráfico de dispersão pI x massa molecular — pendente]_
+![Localização subcelular](results_fastprotein/image/subcell-resume-bar-300dpi.png)
+
+| Localização | Proteínas |
+| :---- | ----: |
+| Citosol | 1.599 |
+| Extracelular | 765 |
+| Membrana plasmática | 504 |
+| Mitocôndria | 247 |
+| Outros | 199 |
+| Núcleo | 167 |
+| Citoesqueleto | 116 |
+| Retículo endoplasmático | 62 |
+| Peroxissomo | 14 |
+| Complexo de Golgi | 2 |
+| Lisossomo | 1 |
+
+> **Observação metodológica:** a predição de localização subcelular do FastProtein
+> é feita pelo WoLFPSORT, que roda aqui com o modelo de organismo *animal*. Por
+> isso aparecem compartimentos que não existem em bactérias — núcleo, mitocôndria,
+> complexo de Golgi, lisossomo. Para *L. interrogans*, que é procarioto, essas
+> categorias devem ser lidas como agrupamentos por composição de aminoácidos, e
+> não como compartimentos reais. As classes biologicamente informativas no caso
+> são **membrana plasmática (504)** e **extracelular (765)**, coerentes com as
+> 939 proteínas que acumulam evidências de membrana.
+
+**Dispersão: ponto isoelétrico × massa molecular**
+(`results_fastprotein/image/kda-vs-pi.png`)
+
+![pI x massa molecular](results_fastprotein/image/kda-vs-pi-300dpi.png)
+
+A distribuição do pI é nitidamente bimodal, com um grupo ácido em torno de pH 5–6
+e outro básico em torno de pH 9, e um vale perto do pH 7,4. Esse padrão de "dupla
+corcova" é comum em proteomas bacterianos e reflete a separação entre proteínas
+citoplasmáticas, que tendem ao lado ácido, e proteínas de membrana e ribossomais,
+que tendem ao básico. A massa molecular concentra-se abaixo de 50 kDa, com poucas
+proteínas passando de 150 kDa.
 
 ---
 
@@ -130,7 +202,7 @@ _[pendente]_
 
 ## 6. REPOSITÓRIO
 
-Qual o repositório git: _[a definir]_
+Qual o repositório git: **https://github.com/Guilfs1/bioinformatica-leptospira**
 
 * [ ] relatorio.pdf
 * [ ] input.fasta
